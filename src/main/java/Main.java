@@ -1,15 +1,11 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        int HANGMAN_SIZE = 6;
         List<String> words = Files.readAllLines(Path.of("src/main/resources/dictionary.txt"));
         System.out.println(words.size() + " слов");
         Random random = new Random();
@@ -27,25 +23,98 @@ public class Main {
                 StringBuilder maskedWord = new StringBuilder();
                 maskedWord.append("*".repeat(word.length()));
                 System.out.println(maskedWord);
-                int fail = 0;
-                var usedLetters = new ArrayList<Character>();
-                while (fail < HANGMAN_SIZE) {
+                int attempt = 6;
+                var usedLetters = new HashSet<Character>();
+                while (attempt > 0) {
                     System.out.println("Введите букву: ");
                     char letter = scanner.next().charAt(0);
+
                     if (word.contains(String.valueOf(letter)) && !usedLetters.contains(letter)) {
                         for (int i = 0; i < word.length(); i++) {
                             if (word.charAt(i) == letter) {
-                                maskedWord.replace(i, i, String.valueOf(letter));
+                                maskedWord.replace(i, i + 1, String.valueOf(letter));
                             }
-                            }
+                        }
+                    } else if (!word.contains(String.valueOf(letter))) {
+                        attempt--;
+                        System.out.println("Такой буквы нет");
+                        if (attempt > 0) {
+                            System.out.println("У вас осталось " + attempt + " попыток");
+                            draw(attempt);
                         } else {
-                        fail++;
+                            System.out.println("Вы проиграли");
+                            System.out.println("Загаданное слово было: " + word);
+                        }
                     }
                     System.out.println(maskedWord);
                     usedLetters.add(letter);
-                    System.out.println("Использованы буквы: " + usedLetters);
+                    System.out.println("Использованы буквы: " + usedLetters + "\n");
+                    if (!maskedWord.toString().contains("*")) {
+                        System.out.println("ПОБЕДА!!!");
+                        break;
+                    }
                 }
             }
         }
     }
+
+    private static void draw(int attempt) {
+        switch (attempt) {
+            case 5 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 4 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 3 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println("  |   |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 2 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println(" /|\\  |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 1 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println(" /|\\  |");
+                System.out.println(" /    |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 0 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
+                System.out.println(" /|\\  |");
+                System.out.println(" / \\  |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+        }
+    }
+
 }
