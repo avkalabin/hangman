@@ -6,46 +6,51 @@ import java.util.*;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        List<String> words = Files.readAllLines(Path.of("src/main/resources/dictionary.txt"));
-        System.out.println(words.size() + " слов");
+        final List<String> wordsList = Files.readAllLines(Path.of("src/main/resources/dictionary.txt"));
+        final String LOWERCASE_RUSSIAN_LETTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        System.out.println(wordsList.size() + " слов");
         Random random = new Random();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("[N]ew game or [E]xit?");
-            Character newGameOrExit = scanner.next().charAt(0);
+            final Character newGameOrExit = scanner.next().charAt(0);
             if ("e".equalsIgnoreCase(String.valueOf(newGameOrExit))) {
                 System.out.println("Exit...");
                 break;
             } else if ("n".equalsIgnoreCase(String.valueOf(newGameOrExit))) {
-                int randomIndex = random.nextInt(words.size());
-                var word = words.get(randomIndex);
-                System.out.println(word);
+                final int randomIndex = random.nextInt(wordsList.size());
+                final var hiddenWord = wordsList.get(randomIndex).toLowerCase();
                 StringBuilder maskedWord = new StringBuilder();
-                maskedWord.append("*".repeat(word.length()));
+                int attemptCount = 6;
+                maskedWord.append("*".repeat(hiddenWord.length()));
+                drawHangman(attemptCount);
                 System.out.println(maskedWord);
-                int attempt = 6;
                 var usedLetters = new HashSet<Character>();
-                while (attempt > 0) {
+                while (attemptCount > 0) {
                     System.out.println("Введите букву: ");
-                    char letter = scanner.next().charAt(0);
-
-                    if (word.contains(String.valueOf(letter)) && !usedLetters.contains(letter)) {
-                        for (int i = 0; i < word.length(); i++) {
-                            if (word.charAt(i) == letter) {
+                    final char letter = Character.toLowerCase(scanner.next().charAt(0));
+                    if (!LOWERCASE_RUSSIAN_LETTERS.contains(String.valueOf(letter))) {
+                        continue;
+                    }
+                    if (hiddenWord.contains(String.valueOf(letter)) && !usedLetters.contains(letter)) {
+                        for (int i = 0; i < hiddenWord.length(); i++) {
+                            if (hiddenWord.charAt(i) == letter) {
                                 maskedWord.replace(i, i + 1, String.valueOf(letter));
                             }
                         }
-                    } else if (!word.contains(String.valueOf(letter))) {
-                        attempt--;
+                    } else if (!hiddenWord.contains(String.valueOf(letter)) && !usedLetters.contains(letter)) {
+                        attemptCount--;
                         System.out.println("Такой буквы нет");
-                        if (attempt > 0) {
-                            System.out.println("У вас осталось " + attempt + " попыток");
-                            draw(attempt);
+                        if (attemptCount > 0) {
+                            System.out.println("У вас осталось " + attemptCount + " попыток");
                         } else {
-                            System.out.println("Вы проиграли");
-                            System.out.println("Загаданное слово было: " + word);
+                            System.out.println("Вы ПРОИГРАЛИ");
+                            System.out.println("Загаданное слово было: " + hiddenWord);
+                            drawHangman(attemptCount);
+                            break;
                         }
                     }
+                    drawHangman(attemptCount);
                     System.out.println(maskedWord);
                     usedLetters.add(letter);
                     System.out.println("Использованы буквы: " + usedLetters + "\n");
@@ -58,12 +63,21 @@ public class Main {
         }
     }
 
-    private static void draw(int attempt) {
+    private static void drawHangman(int attempt) {
         switch (attempt) {
-            case 5 -> {
+            case 6 -> {
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("      |");
+                System.out.println("=========");
+            }
+            case 5 -> {
+                System.out.println("  +---+");
+                System.out.println("  |   |");
+                System.out.println("  O   |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("      |");
@@ -73,7 +87,7 @@ public class Main {
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
-                System.out.println("      |");
+                System.out.println("  |   |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("=========");
@@ -82,7 +96,7 @@ public class Main {
                 System.out.println("  +---+");
                 System.out.println("  |   |");
                 System.out.println("  O   |");
-                System.out.println("  |   |");
+                System.out.println(" /|   |");
                 System.out.println("      |");
                 System.out.println("      |");
                 System.out.println("=========");
