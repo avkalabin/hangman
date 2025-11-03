@@ -29,7 +29,7 @@ public class Main {
         StringBuilder maskedWord = new StringBuilder();
         int attemptCount = 6;
         maskedWord.append("*".repeat(hiddenWord.length()));
-        drawHangman(attemptCount);
+        Hangman.drawHangman(attemptCount);
         System.out.println(maskedWord);
         var usedLetters = new HashSet<Character>();
         while (true) {
@@ -55,13 +55,13 @@ public class Main {
                 if (attemptCount > 0) {
                     System.out.println("У вас осталось " + attemptCount + " попыток");
                 } else {
-                    drawHangman(attemptCount);
+                    Hangman.drawHangman(attemptCount);
                     System.out.println("Вы ПРОИГРАЛИ");
                     System.out.println("Загаданное слово было: " + hiddenWord);
                     break;
                 }
             }
-            drawHangman(attemptCount);
+            Hangman.drawHangman(attemptCount);
             System.out.println(maskedWord);
             usedLetters.add(letter);
             System.out.println("Использованы буквы: " + usedLetters + "\n");
@@ -71,73 +71,4 @@ public class Main {
             }
         }
     }
-
-    private static void drawHangman(int attempt) {
-        switch (attempt) {
-            case 6 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 5 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 4 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println("  |   |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 3 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println(" /|   |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 2 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println(" /|\\  |");
-                System.out.println("      |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 1 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println(" /|\\  |");
-                System.out.println(" /    |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-            case 0 -> {
-                System.out.println("  +---+");
-                System.out.println("  |   |");
-                System.out.println("  O   |");
-                System.out.println(" /|\\  |");
-                System.out.println(" / \\  |");
-                System.out.println("      |");
-                System.out.println("=========");
-            }
-        }
-    }
-
 }
