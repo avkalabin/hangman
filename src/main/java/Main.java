@@ -6,36 +6,53 @@ import java.util.*;
 public class Main {
     private static final int ATTEMPT_COUNT = 6;
     private static final String RUSSIAN_LOWERCASE_LETTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    private final static String START = "н";
+    private final static String QUIT = "в";
+    private static List<String> words;
 
-    public static void main(String[] args) throws IOException {
-        final List<String> wordsList = Files.readAllLines(Path.of("src/main/resources/dictionary.txt"));
-        System.out.println(wordsList.size() + " слов");
+    public static void main(String[] args) {
+        Path dictionaryPath = Path.of("src/main/resources/dictionary.txt");
+        try {
+            words = Files.readAllLines(dictionaryPath);
+        } catch (IOException e) {
+            System.err.println("Ошибка: файл словаря не найден!");
+            System.err.println("Ожидаемый путь: " + dictionaryPath.toAbsolutePath());
+            System.exit(1);
+        }
+        System.out.println("Количество слов: " + words.size());
         try (Scanner scanner = new Scanner(System.in)) {
             while (true) {
                 System.out.println("[Н]овая игра или [В]ыход?");
-                final Character command = scanner.next().charAt(0);
-                if ("в".equalsIgnoreCase(String.valueOf(command))) {
-                    System.out.println("Exit...");
-                    break;
-                } else if ("н".equalsIgnoreCase(String.valueOf(command))) {
-                    playRound(wordsList, scanner);
+                final String input = scanner.nextLine();
+                if (input.length() == 1) {
+                    final Character command = input.charAt(0);
+                    if (QUIT.equalsIgnoreCase(String.valueOf(command))) {
+                        System.out.println("Exit...");
+                        break;
+                    } else if (START.equalsIgnoreCase(String.valueOf(command))) {
+                        playRound(words, scanner);
+                    } else {
+                        System.out.println("Некорректный ввод");
+                    }
+                } else {
+                    System.out.println("Пожалуйста, введите только один символ.");
                 }
             }
         }
     }
 
-    private static void playRound(List<String> wordsList, Scanner scanner) {
-        final String hiddenWord = chooseRandomWord(wordsList);
+    private static void playRound(List<String> words, Scanner scanner) {
+        final String hiddenWord = chooseRandomWord(words);
         StringBuilder maskedWord = maskWord(hiddenWord);
         int attemptsLeft = ATTEMPT_COUNT;
-        Set<Character> usedLetters = new HashSet<>();
+        Set<Character> usedLetters = new TreeSet<>();
 
-        Hangman.drawHangman(attemptsLeft);
+        HangmanRenderer.drawHangman(attemptsLeft);
         System.out.println(maskedWord);
 
         while (true) {
             System.out.println("Введите букву: ");
-            final char letter = Character.toLowerCase(scanner.next().charAt(0));
+            final char letter = Character.toLowerCase(scanner.nextLine().trim().charAt(0));
             if (!isValidLetter(letter)) {
                 System.out.println("Должна быть введена русская буква");
                 continue;
@@ -44,7 +61,7 @@ public class Main {
                 System.out.println("Это букву уже вводили");
                 continue;
             }
-            if (hiddenWord.contains(String.valueOf(letter))) {
+            if (isHiddenWordLetter(hiddenWord, letter)) {
                 updateMaskedWord(hiddenWord, letter, maskedWord);
             } else {
                 attemptsLeft--;
@@ -52,14 +69,14 @@ public class Main {
                 if (attemptsLeft > 0) {
                     System.out.println("У вас осталось " + attemptsLeft + " попыток");
                 } else {
-                    Hangman.drawHangman(attemptsLeft);
+                    HangmanRenderer.drawHangman(attemptsLeft);
                     System.out.println("Вы ПРОИГРАЛИ");
                     System.out.println("Загаданное слово было: " + hiddenWord);
                     break;
                 }
             }
 
-            Hangman.drawHangman(attemptsLeft);
+            HangmanRenderer.drawHangman(attemptsLeft);
             System.out.println(maskedWord);
             usedLetters.add(letter);
             System.out.println("Использованы буквы: " + usedLetters + "\n");
@@ -88,5 +105,9 @@ public class Main {
 
     private static boolean isValidLetter(char letter) {
         return RUSSIAN_LOWERCASE_LETTERS.contains(String.valueOf(letter));
+    }
+
+    private static boolean isHiddenWordLetter(String hiddenWord, char letter) {
+        return hiddenWord.contains(String.valueOf(letter));
     }
 }

@@ -1,4 +1,4 @@
-public class Hangman {
+public class HangmanRenderer {
     private static final String[][] HANGMAN_STAGES = {
             {
                     "  +---+",
